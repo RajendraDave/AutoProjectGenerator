@@ -4,10 +4,15 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -18,7 +23,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.archive.ArchiveFormats;
+import org.eclipse.jgit.dircache.DirCacheIterator;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevTree;
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.treewalk.FileTreeIterator;
+import org.eclipse.jgit.treewalk.TreeWalk;
+import org.primefaces.component.tree.Tree;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -46,7 +60,6 @@ public class AutoProjectGenerator {
     private Map<String,String> frontEndFrameworks = new LinkedHashMap<>();
     private Map<String,String> backEndFrameworks = new LinkedHashMap<>();
     private Map<String,String> services = new LinkedHashMap<>();
-
     @PostConstruct
     public void init() {
         fetchBranchList();
@@ -110,14 +123,7 @@ public class AutoProjectGenerator {
                         .setOutputStream(out).call();
             }
             System.out.println("Completed Cloning");
-
-            ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-            externalContext.setResponseContentType("application/zip");
-            externalContext.setResponseHeader("Content-Disposition", "attachment;filename=\"" + branchName + ".zip\"");
-            externalContext.setResponseHeader("Content-Length", String.valueOf(file.length()));
-
-            Files.copy(file.toPath(), externalContext.getResponseOutputStream());
-            FacesContext.getCurrentInstance().responseComplete();
+            downLoadFile(file, branchName);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -126,8 +132,70 @@ public class AutoProjectGenerator {
         }
     }
     
-    public void called(){
-        System.out.println("Called");
+    public void buildProject() {
+        try {
+            if (StringUtils.isNotBlank(service) || StringUtils.isNotBlank(frontEndFramework) || StringUtils.isNotBlank(backEndFramework)) {
+
+                if (StringUtils.isNotBlank(frontEndFramework) && StringUtils.isNotBlank(backEndFramework) && (frameworkList.containsKey(backEndFramework + "-" + frontEndFramework) || frameworkList.containsKey(frontEndFramework + "-" + backEndFramework))) {
+                    String branchName = frameworkList.containsKey(backEndFramework + "-" + frontEndFramework) ? frameworkList.get(backEndFramework + "-" + frontEndFramework) : frameworkList.get(frontEndFramework + "-" + backEndFramework);
+                    branchName = StringUtils.isNotBlank(frontEndAppName) ? frontEndAppName : branchName;
+                    createArchieve(git, branchName);
+                } else {
+                    if (StringUtils.isNotBlank(frontEndFramework)) {
+                        if (frameworkList.containsKey(frontEndFramework)) {
+                            String branchName = frameworkList.get(frontEndFramework);
+                            branchName = StringUtils.isNotBlank(frontEndAppName) ? frontEndAppName : branchName;
+                            createArchieve(git, branchName);
+                        } else {
+                            String branchName = StringUtils.isNotBlank(frontEndAppName) ? frontEndAppName : frontEndFramework;
+                            String cloneDirectoryPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath() + File.separator + "generatedProject";
+                            File cloneFile = new File(cloneDirectoryPath);
+                            if (!cloneFile.exists()) {
+                                FileUtils.forceMkdir(cloneFile);
+                            }
+                            downLoadFile(cloneFile, branchName);
+                        }
+                    }
+                    if (StringUtils.isNotBlank(backEndFramework)) {
+                        if (frameworkList.containsKey(backEndFramework)) {
+                            String branchName = frameworkList.get(backEndFramework);
+                            branchName = StringUtils.isNotBlank(backEndAppName) ? backEndAppName : branchName;
+                            createArchieve(git, branchName);
+                        } else {
+                            String branchName = StringUtils.isNotBlank(frontEndAppName) ? frontEndAppName : backEndFramework;
+                        }
+                    }
+                }
+                if (StringUtils.isNotBlank(service)) {
+                    if (frameworkList.containsKey(service)) {
+                        String branchName = frameworkList.get(service);
+                        branchName = StringUtils.isNotBlank(serviceAppName) ? serviceAppName : branchName;
+                        createArchieve(git, branchName);
+                    } else {
+                        String branchName = StringUtils.isNotBlank(frontEndAppName) ? frontEndAppName : service;
+                    }
+                }
+
+            } else {
+                System.err.println("Please select model");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void downLoadFile(File file, String branchName) {
+        try {
+            ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+            externalContext.setResponseContentType("application/zip");
+            externalContext.setResponseHeader("Content-Disposition", "attachment;filename=\"" + branchName + ".zip\"");
+            externalContext.setResponseHeader("Content-Length", String.valueOf(file.length()));
+
+            Files.copy(file.toPath(), externalContext.getResponseOutputStream());
+            FacesContext.getCurrentInstance().responseComplete();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public Map<String, String> getFrameworkList() {

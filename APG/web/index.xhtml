@@ -34,27 +34,60 @@
                     </p:dataTable>
                 </p:tab>
                 <p:tab title="Build Projects">
-                    <p:selectOneMenu label="Front End Framework:" value="#{autoProjectGenerator.frontEndFramework}">
-                        <p:ajax event="change" listener="#{autoProjectGenerator.called}" update="web_form:main_tab:frontEndAppTitle"></p:ajax>
-                        <f:selectItem itemLabel="--Select--" itemValue=""></f:selectItem>
-                        <f:selectItems value="#{autoProjectGenerator.frontEndFrameworks}"></f:selectItems>
-                    </p:selectOneMenu>
-                    
-                    <p:inputText id="frontEndAppTitle" label="Frond End Application Title:" value="#{autoProjectGenerator.frontEndAppName}" rendered="#{not empty autoProjectGenerator.frontEndFramework}"></p:inputText>
-                    
-                    <p:selectOneMenu label="Back End Framework:" value="#{autoProjectGenerator.backEndFramework}" rendered="#{autoProjectGenerator.frontEndFramework eq 'angular'}">
-                        <p:ajax event="change" update="web_form:main_tab:backEndAppTitle"></p:ajax>
-                        <f:selectItem itemLabel="--Select--" itemValue=""></f:selectItem>
-                        <f:selectItems value="#{autoProjectGenerator.backEndFrameworks}"></f:selectItems>
-                    </p:selectOneMenu>
-                    <p:inputText id="backEndAppTitle" label="Back End Application Title:" value="#{autoProjectGenerator.backEndAppName}" rendered="#{not empty autoProjectGenerator.backEndFramework}"></p:inputText>
-                    
-                    <p:selectOneMenu label="Rest Services" value="#{autoProjectGenerator.service}">
-                        <p:ajax event="change" update="web_form:main_tab:serviceAppTitle"></p:ajax>
-                        <f:selectItem itemLabel="--Select--" itemValue=""></f:selectItem>
-                        <f:selectItems value="#{autoProjectGenerator.services}"></f:selectItems>
-                    </p:selectOneMenu>
-                    <p:inputText id="serviceAppTitle" value="#{autoProjectGenerator.serviceAppName}" rendered="#{not empty autoProjectGenerator.service}"></p:inputText>
+                    <p:panel id="build_projects" style="border: 0;display: grid;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <p:outputLabel for="frontEnd">Front End Framework</p:outputLabel>
+                                <p:selectOneMenu id="frontEnd" styleClass="form-control" value="#{autoProjectGenerator.frontEndFramework}">
+                                    <p:ajax event="change" update="web_form:main_tab:build_projects"></p:ajax>
+                                    <f:selectItem itemLabel="--Select--" itemValue=""></f:selectItem>
+                                    <f:selectItems value="#{autoProjectGenerator.frontEndFrameworks}"></f:selectItems>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <p:outputLabel id="frontEndAppLabel" for="frontEndAppTitle" rendered="#{not empty autoProjectGenerator.frontEndFramework}">Frond End Application Title</p:outputLabel>
+                                <p:inputText id="frontEndAppTitle" styleClass="form-control" value="#{autoProjectGenerator.frontEndAppName}" rendered="#{not empty autoProjectGenerator.frontEndFramework}"></p:inputText>
+                            </div>
+
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <p:outputLabel id="backEndTitle" for="backEnd" rendered="#{autoProjectGenerator.frontEndFramework eq 'angular'}">Back End Framework</p:outputLabel>
+                                <p:selectOneMenu id="backEnd" styleClass="form-control" value="#{autoProjectGenerator.backEndFramework}" rendered="#{autoProjectGenerator.frontEndFramework eq 'angular'}">
+                                    <p:ajax event="change" update="web_form:main_tab:build_projects"></p:ajax>
+                                    <f:selectItem itemLabel="--Select--" itemValue=""></f:selectItem>
+                                    <f:selectItems value="#{autoProjectGenerator.backEndFrameworks}"></f:selectItems>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <p:outputLabel for="backEndAppTitle" rendered="#{not empty autoProjectGenerator.backEndFramework}">Back End Application Title</p:outputLabel>
+                                <p:inputText id="backEndAppTitle" styleClass="form-control" value="#{autoProjectGenerator.backEndAppName}" rendered="#{not empty autoProjectGenerator.backEndFramework}"></p:inputText>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <p:outputLabel for="service">Rest Services</p:outputLabel>
+                                <p:selectOneMenu id="service" styleClass="form-control" value="#{autoProjectGenerator.service}">
+                                    <p:ajax event="change" update="web_form:main_tab:build_projects"></p:ajax>
+                                    <f:selectItem itemLabel="--Select--" itemValue=""></f:selectItem>
+                                    <f:selectItems value="#{autoProjectGenerator.services}"></f:selectItems>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <p:outputLabel for="serviceAppTitle" rendered="#{not empty autoProjectGenerator.service}">Service App Name</p:outputLabel>
+                                <p:inputText id="serviceAppTitle" styleClass="form-control" value="#{autoProjectGenerator.serviceAppName}" rendered="#{not empty autoProjectGenerator.service}"></p:inputText>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <h:commandButton class="btn btn-primary" value="build" action="#{autoProjectGenerator.buildProject}"></h:commandButton>
+                        </div>
+                    </p:panel>
                 </p:tab>
             </p:tabView>
             
