@@ -46,20 +46,26 @@ public class AutoProjectGenerator {
         try {
             File cloneDir = new File("E:\\testCheckout");
             if (cloneDir.exists()) {
-                FileUtils.deleteDirectory(cloneDir);
-                FileUtils.forceMkdir(cloneDir);
+//                FileUtils.deleteDirectory(cloneDir);
+//                FileUtils.forceMkdir(cloneDir);
+                git = Git.open(new File(cloneDirectoryPath));
+                //git.checkout().setName("master").setStartPoint("refs/remotes/origin/master").call();
 
             } else {
                 FileUtils.forceMkdir(cloneDir);
-            }
-            git = Git.cloneRepository().setURI(repoUrl).setBranch("refs/remotes/origin/master")
+                git = Git.cloneRepository().setURI(repoUrl).setBranch("refs/remotes/origin/master")
                     .setDirectory(Paths.get(cloneDirectoryPath).toFile()).call();
+            }
+//            git = Git.cloneRepository().setURI(repoUrl).setBranch("refs/remotes/origin/master")
+//                    .setDirectory(Paths.get(cloneDirectoryPath).toFile()).call();
 
             List<Ref> call = git.branchList().setListMode(ListMode.ALL).call();
-            for (Ref ref : call) {
+            for(Ref ref : call) {
                 String[] refBranchName = ref.getName().split("/");
                 String branchName = refBranchName[refBranchName.length - 1];
-                frameworkList.put(branchName, ref.getName());
+                if(!branchName.equalsIgnoreCase("master")){
+                    frameworkList.put(branchName, ref.getName());
+                }
             }
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -67,7 +73,7 @@ public class AutoProjectGenerator {
         }
     }
     
-    public void download(){
+    public void download(String framework){
         createArchieve(git, framework);
     }
 
