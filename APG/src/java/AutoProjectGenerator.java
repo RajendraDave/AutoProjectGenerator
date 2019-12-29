@@ -42,22 +42,19 @@ public class AutoProjectGenerator {
 
     public void fetchBranchList() {
         String repoUrl = "https://github.com/omsai90/Boiler-Plate.git";
-        String cloneDirectoryPath = "E:\\testCheckout";
+        String cloneDirectoryPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath() + File.separator +"testCheckout";
         try {
-            File cloneDir = new File("E:\\testCheckout");
+            File cloneDir = new File(cloneDirectoryPath);
             if (cloneDir.exists()) {
-//                FileUtils.deleteDirectory(cloneDir);
-//                FileUtils.forceMkdir(cloneDir);
                 git = Git.open(new File(cloneDirectoryPath));
-                //git.checkout().setName("master").setStartPoint("refs/remotes/origin/master").call();
+                git.fetch().call();
+                git.pull().call();
 
             } else {
                 FileUtils.forceMkdir(cloneDir);
                 git = Git.cloneRepository().setURI(repoUrl).setBranch("refs/remotes/origin/master")
                     .setDirectory(Paths.get(cloneDirectoryPath).toFile()).call();
             }
-//            git = Git.cloneRepository().setURI(repoUrl).setBranch("refs/remotes/origin/master")
-//                    .setDirectory(Paths.get(cloneDirectoryPath).toFile()).call();
 
             List<Ref> call = git.branchList().setListMode(ListMode.ALL).call();
             for(Ref ref : call) {

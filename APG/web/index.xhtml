@@ -10,25 +10,6 @@
             .order-table{   
                 border-collapse:collapse;
             }
-
-            .order-table-header{
-                    text-align:center;
-                    background:none repeat scroll 0 0 #E5E5E5;
-                    border-bottom:1px solid #BBBBBB;
-                    padding:16px;
-            }
-
-            .order-table-odd-row{
-                    text-align:center;
-                    background:none repeat scroll 0 0 #FFFFFFF;
-                    border-top:1px solid #BBBBBB;
-            }
-
-            .order-table-even-row{
-                    text-align:center;
-                    background:none repeat scroll 0 0 #F9F9F9;
-                    border-top:1px solid #BBBBBB;
-            }
         </style>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></link>
         
@@ -49,7 +30,7 @@
                                  var="framework">
                         
                         <p:column headerText="Sr No.">#{index + 1}</p:column>
-                        <p:column headerText="Framework">#{framework.key}</p:column>
+                        <p:column style="text-transform: capitalize;" headerText="Framework">#{framework.key}</p:column>
                         <p:column headerText="Action"><h:commandLink action="#{autoProjectGenerator.download(framework.value)}"><i class="fa fa-download"></i></h:commandLink></p:column>
                     </p:dataTable>
                 </p:tab>
