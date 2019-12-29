@@ -5,7 +5,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
     <h:head>
-        <title>Facelet Title</title>
+        <title>Auto Project Generator</title>
         <style>
             .order-table{   
                 border-collapse:collapse;
@@ -14,12 +14,11 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></link>
         
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"></link>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     </h:head>
     <h:body>
-        <h:form>
-            <p:tabView  style="padding-right: 10px;">
+        <h:form id="web_form">
+            <p:tabView id="main_tab" style="padding-right: 10px;">
                 <p:tab title="Sample Boiler Plates">
                     <p:dataTable style="width: 100%;" styleClass="order-table text-center table table-hover"
                                  rowIndexVar="index" rows="10"
@@ -35,7 +34,27 @@
                     </p:dataTable>
                 </p:tab>
                 <p:tab title="Build Projects">
+                    <p:selectOneMenu label="Front End Framework:" value="#{autoProjectGenerator.frontEndFramework}">
+                        <p:ajax event="change" listener="#{autoProjectGenerator.called}" update="web_form:main_tab:frontEndAppTitle"></p:ajax>
+                        <f:selectItem itemLabel="--Select--" itemValue=""></f:selectItem>
+                        <f:selectItems value="#{autoProjectGenerator.frontEndFrameworks}"></f:selectItems>
+                    </p:selectOneMenu>
                     
+                    <p:inputText id="frontEndAppTitle" label="Frond End Application Title:" value="#{autoProjectGenerator.frontEndAppName}" rendered="#{not empty autoProjectGenerator.frontEndFramework}"></p:inputText>
+                    
+                    <p:selectOneMenu label="Back End Framework:" value="#{autoProjectGenerator.backEndFramework}" rendered="#{autoProjectGenerator.frontEndFramework eq 'angular'}">
+                        <p:ajax event="change" update="web_form:main_tab:backEndAppTitle"></p:ajax>
+                        <f:selectItem itemLabel="--Select--" itemValue=""></f:selectItem>
+                        <f:selectItems value="#{autoProjectGenerator.backEndFrameworks}"></f:selectItems>
+                    </p:selectOneMenu>
+                    <p:inputText id="backEndAppTitle" label="Back End Application Title:" value="#{autoProjectGenerator.backEndAppName}" rendered="#{not empty autoProjectGenerator.backEndFramework}"></p:inputText>
+                    
+                    <p:selectOneMenu label="Rest Services" value="#{autoProjectGenerator.service}">
+                        <p:ajax event="change" update="web_form:main_tab:serviceAppTitle"></p:ajax>
+                        <f:selectItem itemLabel="--Select--" itemValue=""></f:selectItem>
+                        <f:selectItems value="#{autoProjectGenerator.services}"></f:selectItems>
+                    </p:selectOneMenu>
+                    <p:inputText id="serviceAppTitle" value="#{autoProjectGenerator.serviceAppName}" rendered="#{not empty autoProjectGenerator.service}"></p:inputText>
                 </p:tab>
             </p:tabView>
             

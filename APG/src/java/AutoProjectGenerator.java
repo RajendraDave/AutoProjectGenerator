@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
@@ -13,6 +14,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.archive.ArchiveFormats;
@@ -34,10 +36,21 @@ public class AutoProjectGenerator {
     public Map<String, String> frameworkList = new HashMap<String, String>();
     public Git git;
     public String framework;
+    private String frontEndFramework = StringUtils.EMPTY;
+    private String backEndFramework = StringUtils.EMPTY;
+    private String service = StringUtils.EMPTY;
+    private String frontEndAppName = StringUtils.EMPTY;
+    private String backEndAppName = StringUtils.EMPTY;
+    private String serviceAppName = StringUtils.EMPTY;
+    
+    private Map<String,String> frontEndFrameworks = new LinkedHashMap<>();
+    private Map<String,String> backEndFrameworks = new LinkedHashMap<>();
+    private Map<String,String> services = new LinkedHashMap<>();
 
     @PostConstruct
     public void init() {
         fetchBranchList();
+        fetchFrameworks();
     }
 
     public void fetchBranchList() {
@@ -70,6 +83,20 @@ public class AutoProjectGenerator {
         }
     }
     
+    public void fetchFrameworks() {
+        frontEndFrameworks = new LinkedHashMap<>();
+        frontEndFrameworks.put("Django", "django");
+        frontEndFrameworks.put("Angular", "angular");
+        frontEndFrameworks.put("Java Server Faces", "JSF");
+        
+        backEndFrameworks = new LinkedHashMap<>();
+        backEndFrameworks.put("Django", "django");
+        
+        services = new LinkedHashMap<>();
+        services.put("Strapi", "strapi");
+        
+    }
+    
     public void download(String framework){
         createArchieve(git, framework);
     }
@@ -98,6 +125,10 @@ public class AutoProjectGenerator {
             ArchiveFormats.unregisterAll();
         }
     }
+    
+    public void called(){
+        System.out.println("Called");
+    }
 
     public Map<String, String> getFrameworkList() {
         return frameworkList;
@@ -121,6 +152,78 @@ public class AutoProjectGenerator {
 
     public void setFramework(String framework) {
         this.framework = framework;
+    }
+
+    public String getFrontEndFramework() {
+        return frontEndFramework;
+    }
+
+    public void setFrontEndFramework(String frontEndFramework) {
+        this.frontEndFramework = frontEndFramework;
+    }
+
+    public String getBackEndFramework() {
+        return backEndFramework;
+    }
+
+    public void setBackEndFramework(String backEndFramework) {
+        this.backEndFramework = backEndFramework;
+    }
+
+    public String getService() {
+        return service;
+    }
+
+    public void setService(String service) {
+        this.service = service;
+    }
+
+    public String getFrontEndAppName() {
+        return frontEndAppName;
+    }
+
+    public void setFrontEndAppName(String frontEndAppName) {
+        this.frontEndAppName = frontEndAppName;
+    }
+
+    public String getBackEndAppName() {
+        return backEndAppName;
+    }
+
+    public void setBackEndAppName(String backEndAppName) {
+        this.backEndAppName = backEndAppName;
+    }
+
+    public String getServiceAppName() {
+        return serviceAppName;
+    }
+
+    public void setServiceAppName(String serviceAppName) {
+        this.serviceAppName = serviceAppName;
+    }
+
+    public Map<String, String> getFrontEndFrameworks() {
+        return frontEndFrameworks;
+    }
+
+    public void setFrontEndFrameworks(Map<String, String> frontEndFrameworks) {
+        this.frontEndFrameworks = frontEndFrameworks;
+    }
+
+    public Map<String, String> getBackEndFrameworks() {
+        return backEndFrameworks;
+    }
+
+    public void setBackEndFrameworks(Map<String, String> backEndFrameworks) {
+        this.backEndFrameworks = backEndFrameworks;
+    }
+
+    public Map<String, String> getServices() {
+        return services;
+    }
+
+    public void setServices(Map<String, String> services) {
+        this.services = services;
     }
 
 }
